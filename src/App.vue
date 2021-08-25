@@ -1,5 +1,5 @@
 <template>
-    <img :src="logoURL" width="200" height="200">
+	<img :src="logoURL" width="200" height="200" />
 	<h1>{{ title }}</h1>
 
 	<h2>Add a new task</h2>
@@ -9,7 +9,7 @@
 			>You have {{ allTasks }} {{ allTasks > 1 ? "tasks" : "task" }} at
 			the moment</span
 		>
-        <br>
+		<br />
 
 		<input
 			type="text"
@@ -29,15 +29,26 @@
 	</div>
 
 	<ul>
-		<li v-for="task in tasks" :key="task.id">
-			{{ task.id }}. {{ task.name }} - {{ task.finished }}
+		<li
+			v-for="(task, index) in tasks"
+			:key="task.id"
+			@click="finishTask(task)"
+			:class="{ strike: task.finished }"
+		>
+			{{ index + 1 }}. {{ task.name }} - {{ task.finished }}
 
-			<div v-if="task.finished">
+			<div v-if="task.finished" @click="removeTask(task.id)">
 				<button>Delete task</button>
 			</div>
 		</li>
 	</ul>
 </template>
+
+<style>
+	.strike {
+		text-decoration: line-through;
+	}
+</style>
 
 <script>
 	export default {
@@ -50,7 +61,8 @@
 					{ id: 2, name: "Task number 2", finished: false },
 					{ id: 3, name: "Task number 3", finished: false },
 				],
-                logoURL: "https://upload.wikimedia.org/wikipedia/commons/f/f1/Vue.png"
+				logoURL:
+					"https://upload.wikimedia.org/wikipedia/commons/f/f1/Vue.png",
 			};
 		},
 
@@ -70,15 +82,28 @@
 				// Clear out newTask to store new one
 				this.newTask = "";
 			},
+
+			finishTask(task) {
+				task.finished = !task.finished;
+			},
+
+			removeTask(taskID) {
+                // Using filter is a choice too but not a good way to understand
+                // It uses Array.filter to return elements not matching a value.
+				this.tasks = this.tasks.filter((task) => {
+					return task.id != taskID;
+				});
+				console.log(this.tasks.length);
+			},
 		},
 
 		computed: {
 			allTasks() {
 				return this.tasks.length;
 			},
-			latest() {
-				return [...this.tasks].reverse();
-			},
+			// latest() {
+			// 	return [...this.tasks].reverse();
+			// },
 		},
 	};
 </script>
